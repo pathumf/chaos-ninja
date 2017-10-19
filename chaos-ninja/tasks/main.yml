@@ -74,7 +74,7 @@
   when: fail_dns_enable == "true"
 
 - name: "fail ec2 api"
-  command: "{{ item }}"
+  shell: "{{ item }}"
   with_items:
     - echo "127.0.0.1 ec2.us-east-1.amazonaws.com" >> /etc/hosts
     - echo "127.0.0.1 ec2.us-northeast-1.amazonaws.com" >> /etc/hosts
@@ -87,7 +87,7 @@
   when: fail_ec2_api_enabled == "true"
 
 - name: "fail s3 api"
-  command: "{{ item }}"
+  shell: "{{ item }}"
   with_items:
     - echo "127.0.0.1 s3.amazonaws.com" >> /etc/hosts
     - echo "127.0.0.1 s3-external-1.amazonaws.com" >> /etc/hosts
@@ -101,7 +101,7 @@
   when: fail_s3_enabled == "true"
 
 - name: "fail dynamodb api"
-  command: "{{ item }}"
+  shell: "{{ item }}"
   with_items: 
     - echo "127.0.0.1 dynamodb.us-east-1.amazonaws.com" >> /etc/hosts
     - echo "127.0.0.1 dynamodb.us-northeast-1.amazonaws.com" >> /etc/hosts
