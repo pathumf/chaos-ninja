@@ -118,7 +118,7 @@
   when: network_corruption_enabled == "true"
 
 - name: "network latency"
-  command: tc qdisc del dev eth0 root netem delay 1000ms 500ms
+  command: tc qdisc add dev eth0 root netem delay 1000ms 500ms
   when: network_latency_enabled == "true"
 
 - name: "network_loss"

@@ -10,9 +10,9 @@ null_route_enable: "false"
 fail_dns_enable: "false"
 fail_ec2_api_enabled: "false"
 fail_s3_enabled: "false"
-fail_dynamodb_enabled: "true"
+fail_dynamodb_enabled: "false"
 network_corruption_enabled: "false"
-network_latency_enabled: "false"
+network_latency_enabled: "true"
 network_loss_enabled: "false"                     
 
 
