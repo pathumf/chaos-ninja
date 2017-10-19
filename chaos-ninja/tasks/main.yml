@@ -1,0 +1,127 @@
+---
+# tasks file for chaos-ninja
+- name: install python 2
+  raw: test -e /usr/bin/python || (apt -y update && apt install -y python-minimal)
+
+- name: "block all network traffic"
+  command: "{{ item }}"
+  with_items:
+    - iptables -I INPUT -s {{ public_ip }} -j ACCEPT
+    - iptables -P INPUT DROP
+  when: block_all_network_traffic_enabled == "true"
+
+- name: "cpu burn"
+  copy:
+    src: ./chaos-ninja/templates/cpuburn.sh
+    dest: /tmp/cpuburn.sh
+    owner: root
+    group: root
+    mode: 0777
+  when: burn_cpu_enabled == "true"
+  register: burn_cpu_copy
+
+- name: "execute cpu burn"  
+  command: /bin/bash /tmp/cpuburn.sh 
+  when: 
+    - burn_cpu_enabled == "true" 
+    - burn_cpu_copy|success
+
+- name: "burn io"
+  copy:
+    src: ./chaos-ninja/templates/burnio.sh  
+    dest: /tmp/ioburn.sh
+    owner: root
+    group: root
+    mode: 0777
+  when: burn_io_enabled == "true"
+  register: burn_io_copy
+
+- name: "execute io burn"
+  command: /bin/bash /tmp/ioburn.sh
+  when: 
+    - burn_io_enabled == "true"
+    - burn_io_copy|success
+
+- name: "fill disk"
+  command: nohup dd if=/dev/urandom of=/burn bs=1M count=65536 iflag=fullblock &
+  when: fill_disk_enable == "true"
+
+- name: "kill process"
+  copy: 
+    src: ./chaos-ninja/templates/killprocess.sh
+    dest: /tmp/killprocess.sh
+    owner: root
+    group: root
+    mode: 0777
+  when: kill_process_enabled == "true"
+  register: kill_process_copy
+
+- name: "execute kill process"
+  command: /bin/bash /tmp/killprocess.sh
+  when: 
+    - kill_process_enabled == "true"
+    - kill_process_copy|success
+
+- name: "null_route_enable"
+  command: ip route add blackhole {{ null_route }}
+  when: null_route_enable == "true"
+
+- name: "fail dns"
+  command: "{{ item }}"
+  with_items:
+    - iptables -A INPUT -p tcp -m tcp --dport 53 -j DROP
+    - iptables -A INPUT -p udp -m udp --dport 53 -j DROP
+  when: fail_dns_enable == "true"
+
+- name: "fail ec2 api"
+  command: "{{ item }}"
+  with_items:
+    - echo "127.0.0.1 ec2.us-east-1.amazonaws.com" >> /etc/hosts
+    - echo "127.0.0.1 ec2.us-northeast-1.amazonaws.com" >> /etc/hosts
+    - echo "127.0.0.1 ec2.us-west-1.amazonaws.com" >> /etc/hosts
+    - echo "127.0.0.1 ec2.us-west-2.amazonaws.com" >> /etc/hosts
+    - echo "127.0.0.1 ec2.sa-east-1.amazonaws.com" >> /etc/hosts
+    - echo "127.0.0.1 ec2.ap-southeast-1.amazonaws.com" >> /etc/hosts
+    - echo "127.0.0.1 ec2.ap-southeast-2.amazonaws.com" >> /etc/hosts
+    - echo "127.0.0.1 ec2.eu-west-1.amazonaws.com" >> /etc/hosts
+  when: fail_ec2_api_enabled == "true"
+
+- name: "fail s3 api"
+  command: "{{ item }}"
+  with_items:
+    - echo "127.0.0.1 s3.amazonaws.com" >> /etc/hosts
+    - echo "127.0.0.1 s3-external-1.amazonaws.com" >> /etc/hosts
+    - echo "127.0.0.1 s3-us-west-1.amazonaws.com" >> /etc/hosts
+    - echo "127.0.0.1 s3-us-west-2.amazonaws.com" >> /etc/hosts
+    - echo "127.0.0.1 s3-eu-west-1.amazonaws.com" >> /etc/hosts
+    - echo "127.0.0.1 s3-ap-southeast-1.amazonaws.com" >> /etc/hosts
+    - echo "127.0.0.1 s3-ap-southeast-2.amazonaws.com" >> /etc/hosts
+    - echo "127.0.0.1 s3-ap-northeast-1.amazonaws.com" >> /etc/hosts
+    - echo "127.0.0.1 s3-sa-east-1.amazonaws.com" >> /etc/hosts
+  when: fail_s3_enabled == "true"
+
+- name: "fail dynamodb api"
+  command: "{{ item }}"
+  with_items: 
+    - echo "127.0.0.1 dynamodb.us-east-1.amazonaws.com" >> /etc/hosts
+    - echo "127.0.0.1 dynamodb.us-northeast-1.amazonaws.com" >> /etc/hosts
+    - echo "127.0.0.1 dynamodb.us-west-1.amazonaws.com" >> /etc/hosts
+    - echo "127.0.0.1 dynamodb.us-west-2.amazonaws.com" >> /etc/hosts
+    - echo "127.0.0.1 dynamodb.sa-east-1.amazonaws.com" >> /etc/hosts
+    - echo "127.0.0.1 dynamodb.ap-southeast-1.amazonaws.com" >> /etc/hosts
+    - echo "127.0.0.1 dynamodb.ap-southeast-2.amazonaws.com" >> /etc/hosts
+    - echo "127.0.0.1 dynamodb.eu-west-1.amazonaws.com" >> /etc/hosts
+  when: fail_dynamodb_enabled == "true"
+
+- name: "network corruption"
+  command: tc qdisc add dev eth0 root netem corrupt 5%
+  when: network_corruption_enabled == "true"
+
+- name: "network latency"
+  command: tc qdisc del dev eth0 root netem delay 1000ms 500ms
+  when: network_latency_enabled == "true"
+
+- name: "network_loss"
+  command: tc qdisc add dev eth0 root netem loss 7% 25%
+  when: network_loss_enabled == "true"
+

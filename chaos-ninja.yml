@@ -1,0 +1,10 @@
+---
+- name: chaos-ninja
+  hosts: all_host
+  user: ubuntu
+  become: true
+  gather_facts: no
+  vars_files:
+    - ./chaos-ninja/defaults/main.yml
+  roles:
+    - role: "./chaos-ninja"

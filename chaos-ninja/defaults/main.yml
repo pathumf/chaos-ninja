@@ -1,0 +1,21 @@
+---
+# defaults file for chaos-ninja
+
+block_all_network_traffic_enabled: "false"
+burn_cpu_enabled: "false"
+burn_io_enabled: "false"
+fill_disk_enable: "false"
+kill_process_enabled: "false"
+null_route_enable: "false"
+fail_dns_enable: "false"
+fail_ec2_api_enabled: "false"
+fail_s3_enabled: "false"
+fail_dynamodb_enabled: "false"
+network_corruption_enabled: "false"
+network_latency_enabled: "false"
+network_loss_enabled: "false"                     
+
+
+
+public_ip: "217.45.177.108"                       # Public IP 
+null_route: "10.0.0.0/8"                          # Add your CIDR of VPC/8 i.e  172.0.0.0/8

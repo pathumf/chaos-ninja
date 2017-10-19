@@ -1,0 +1,6 @@
+galaxy_info:
+  author: pathum fernando 
+  description: simulate AWS resources failure
+  company: cake solutions
+
+dependencies: []
