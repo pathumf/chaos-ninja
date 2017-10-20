@@ -17,4 +17,16 @@ Enable with: `burn_cpu_enabled` = true
 This tool runs disk intensive processes, simulating a noisy neighbor or a faulty disk. The instance will effectively have a much slower disk.
 
 Enable with: `burn_cpu_enabled` = true 
+
+# Fill Disk 
+
+This tool writes a huge file to the root device, filling up the (typically relatively small) EC2 root disk.
+
+Enable with: `fill_disk_enable` = true 
+
+# Kill Processes 
+
+This tool kills any java, python or node programs it finds every second, simulating a faulty application, corrupted installation or faulty instance. The instance is fine, but the java/python/node application running on it will fail.
+
+Enable with: `kill_process_enabled` = true 
  
