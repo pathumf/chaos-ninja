@@ -12,4 +12,9 @@ This tool runs CPU intensive processes, simulating a noisy neighbor or a faulty 
 
 Enable with: `burn_cpu_enabled` = true
 
+# Burn-IO 
+
+This tool runs disk intensive processes, simulating a noisy neighbor or a faulty disk. The instance will effectively have a much slower disk.
+
+Enable with: `burn_cpu_enabled` = true 
  
